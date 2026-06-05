@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FocusOS — AI Productivity System</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --purple: #7C3AED;
+      --purple-light: #EDE9FE;
+      --yellow: #F59E0B;
+      --yellow-light: #FEF3C7;
+      --green: #059669;
+      --green-light: #D1FAE5;
+      --pink: #DB2777;
+      --pink-light: #FCE7F3;
+      --orange: #EA580C;
+      --orange-light: #FFEDD5;
+      --dark: #1E1B4B;
+      --bg: #F5F3FF;
+    }
+
+    body {
+      font-family: 'Space Grotesk', sans-serif;
+      background: var(--bg);
+      color: #1E1B4B;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      background: rgba(245,243,255,0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 2px solid var(--purple-light);
+      padding: 16px 48px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 100;
+    }
+
+    .logo {
+      font-family: 'Space Mono', monospace;
+      font-size: 18px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #7C3AED, #DB2777);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    nav ul { display: flex; gap: 28px; list-style: none; }
+    nav ul a {
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #6D28D9;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    nav ul a:hover { color: var(--pink); }
+
+    /* HERO */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 120px 48px 80px;
+      max-width: 900px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--purple-light);
+      border: 2px solid #C4B5FD;
+      border-radius: 100px;
+      padding: 8px 20px;
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #6D28D9;
+      margin-bottom: 32px;
+      width: fit-content;
+      font-weight: 600;
+    }
+
+    .hero h1 {
+      font-size: 72px;
+      font-weight: 700;
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+      margin-bottom: 24px;
+      color: var(--dark);
+    }
+
+    .hero h1 .highlight {
+      background: linear-gradient(135deg, #7C3AED, #DB2777);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero h1 .highlight-yellow {
+      background: linear-gradient(135deg, #F59E0B, #EA580C);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-sub {
+      font-size: 20px;
+      color: #5B21B6;
+      max-width: 580px;
+      margin-bottom: 48px;
+      font-weight: 400;
+      opacity: 0.8;
+    }
+
+    .meta-row {
+      display: flex;
+      gap: 0;
+      border: 2px solid #C4B5FD;
+      border-radius: 20px;
+      overflow: hidden;
+      width: fit-content;
+      background: #fff;
+    }
+
+    .meta-item {
+      padding: 16px 28px;
+      border-right: 2px solid #C4B5FD;
+    }
+    .meta-item:last-child { border-right: none; }
+    .meta-item .mlabel {
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #8B5CF6;
+      margin-bottom: 4px;
+      font-weight: 600;
+    }
+    .meta-item .mval {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--dark);
+    }
+
+    /* HERO BG BLOBS */
+    .blob1 {
+      position: absolute;
+      top: 100px;
+      right: -100px;
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(124,58,237,0.15), transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    .blob2 {
+      position: absolute;
+      bottom: 0;
+      left: -50px;
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, rgba(219,39,119,0.12), transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    /* SECTIONS */
+    section {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 80px 48px;
+    }
+
+    .section-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--purple);
+      margin-bottom: 16px;
+      font-weight: 700;
+    }
+
+    h2 {
+      font-size: 44px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 20px;
+      line-height: 1.15;
+      color: var(--dark);
+    }
+
+    .body-text {
+      font-size: 17px;
+      color: #5B21B6;
+      max-width: 640px;
+      margin-bottom: 48px;
+      font-weight: 400;
+      opacity: 0.8;
+    }
+
+    /* STRIPE DIVIDER */
+    .stripe {
+      height: 6px;
+      background: linear-gradient(90deg, #7C3AED, #DB2777, #F59E0B, #059669, #EA580C, #7C3AED);
+      background-size: 200% 100%;
+    }
+
+    /* PROBLEM CARDS */
+    .prob-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .prob-card {
+      background: #fff;
+      border: 2px solid #E9D5FF;
+      border-radius: 20px;
+      padding: 28px;
+      transition: all 0.2s;
+    }
+    .prob-card:hover {
+      border-color: var(--purple);
+      transform: translateY(-3px);
+      box-shadow: 0 12px 32px rgba(124,58,237,0.12);
+    }
+
+    .prob-icon { font-size: 32px; margin-bottom: 16px; }
+
+    .prob-card h3 {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--dark);
+    }
+
+    .prob-card p {
+      font-size: 14px;
+      color: #6D28D9;
+      line-height: 1.6;
+      opacity: 0.75;
+    }
+
+    /* WORKFLOW */
+    .workflow { display: flex; flex-direction: column; gap: 0; }
+
+    .wf-step {
+      display: flex;
+      gap: 24px;
+      padding: 36px 0;
+      border-bottom: 2px solid #E9D5FF;
+      align-items: flex-start;
+    }
+    .wf-step:last-child { border-bottom: none; }
+
+    .wf-num {
+      font-family: 'Space Mono', monospace;
+      font-size: 56px;
+      font-weight: 700;
+      color: #DDD6FE;
+      line-height: 1;
+      min-width: 70px;
+    }
+
+    .wf-content h3 {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--dark);
+    }
+
+    .wf-content p {
+      font-size: 15px;
+      color: #5B21B6;
+      opacity: 0.8;
+    }
+
+    .wf-tag {
+      display: inline-block;
+      background: var(--purple-light);
+      border: 2px solid #C4B5FD;
+      border-radius: 100px;
+      padding: 4px 14px;
+      font-size: 11px;
+      color: #6D28D9;
+      margin-bottom: 10px;
+      font-family: 'Space Mono', monospace;
+      font-weight: 700;
+    }
+
+    /* PROMPTS */
+    .prompt-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .prompt-card {
+      border-radius: 20px;
+      padding: 28px;
+      border: 2px solid;
+    }
+
+    .pc-morning {
+      background: var(--yellow-light);
+      border-color: #FCD34D;
+    }
+    .pc-task {
+      background: var(--green-light);
+      border-color: #6EE7B7;
+    }
+    .pc-habit {
+      background: var(--pink-light);
+      border-color: #F9A8D4;
+    }
+    .pc-weekly {
+      background: var(--orange-light);
+      border-color: #FED7AA;
+    }
+
+    .pc-trigger {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .pc-morning .pc-trigger { color: #B45309; }
+    .pc-task .pc-trigger { color: #065F46; }
+    .pc-habit .pc-trigger { color: #9D174D; }
+    .pc-weekly .pc-trigger { color: #9A3412; }
+
+    .prompt-card h3 {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 10px;
+      color: var(--dark);
+    }
+
+    .pc-morning p { color: #92400E; font-size: 14px; line-height: 1.6; }
+    .pc-task p { color: #064E3B; font-size: 14px; line-height: 1.6; }
+    .pc-habit p { color: #831843; font-size: 14px; line-height: 1.6; }
+    .pc-weekly p { color: #7C2D12; font-size: 14px; line-height: 1.6; }
+
+    /* LEVELS */
+    .levels-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .level-card {
+      background: #fff;
+      border: 2px solid #E9D5FF;
+      border-radius: 16px;
+      padding: 20px 16px;
+      text-align: center;
+      transition: all 0.2s;
+    }
+
+    .level-card:hover {
+      border-color: var(--purple);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(124,58,237,0.12);
+    }
+
+    .level-emoji { font-size: 28px; margin-bottom: 8px; }
+    .level-num {
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      color: #8B5CF6;
+      margin-bottom: 4px;
+      font-weight: 700;
+    }
+    .level-name { font-size: 14px; font-weight: 700; color: var(--dark); margin-bottom: 4px; }
+    .level-pts { font-size: 12px; color: #7C3AED; font-family: 'Space Mono', monospace; }
+
+    /* POINTS TABLE */
+    .pts-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 2px solid #E9D5FF;
+    }
+
+    .pts-table th {
+      text-align: left;
+      padding: 14px 20px;
+      background: var(--purple-light);
+      color: #5B21B6;
+      font-weight: 700;
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .pts-table td {
+      padding: 14px 20px;
+      border-bottom: 1px solid #F3E8FF;
+      color: #3B0764;
+      background: #fff;
+    }
+
+    .pts-table tr:last-child td { border-bottom: none; }
+
+    .pts-table td:last-child {
+      font-family: 'Space Mono', monospace;
+      color: var(--purple);
+      font-weight: 700;
+    }
+
+    /* RESULTS */
+    .results-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .result-card {
+      background: #fff;
+      border: 2px solid #E9D5FF;
+      border-radius: 20px;
+      padding: 36px;
+      text-align: center;
+      transition: all 0.2s;
+    }
+
+    .result-card:hover {
+      border-color: var(--purple);
+      box-shadow: 0 12px 32px rgba(124,58,237,0.12);
+    }
+
+    .r-before {
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #8B5CF6;
+      margin-bottom: 8px;
+      font-weight: 700;
+    }
+
+    .r-after {
+      font-size: 56px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      background: linear-gradient(135deg, #7C3AED, #DB2777);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      line-height: 1;
+      margin-bottom: 10px;
+    }
+
+    .r-label { font-size: 15px; color: #5B21B6; font-weight: 500; }
+
+    /* STACK */
+    .stack-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 36px;
+    }
+
+    .stack-pill {
+      background: var(--purple-light);
+      border: 2px solid #C4B5FD;
+      border-radius: 100px;
+      padding: 8px 20px;
+      font-size: 13px;
+      color: #5B21B6;
+      font-family: 'Space Mono', monospace;
+      font-weight: 700;
+    }
+
+    /* FOOTER */
+    footer {
+      text-align: center;
+      padding: 48px;
+      font-size: 13px;
+      color: #8B5CF6;
+      font-family: 'Space Mono', monospace;
+      border-top: 2px solid #E9D5FF;
+    }
+
+    footer span { color: var(--pink); font-weight: 700; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">FocusOS</div>
+  <ul>
+    <li><a href="#problem">Problem</a></li>
+    <li><a href="#system">System</a></li>
+    <li><a href="#prompts">Prompts</a></li>
+    <li><a href="#gamification">Levels</a></li>
+    <li><a href="#results">Results</a></li>
+  </ul>
+</nav>
+
+<div class="hero">
+  <div class="blob1"></div>
+  <div class="blob2"></div>
+  <div class="hero-badge">⚡ Claude AI · Notion · Zapier · Case Study</div>
+  <h1>Stop deciding.<br><span class="highlight">Start doing.</span></h1>
+  <p class="hero-sub">
+    I built a Claude AI productivity system that eliminates decision fatigue —
+    automating daily planning, task prioritization, habit tracking, and weekly reviews inside Notion.
+  </p>
+  <div class="meta-row">
+    <div class="meta-item">
+      <div class="mlabel">Project</div>
+      <div class="mval">FocusOS</div>
+    </div>
+    <div class="meta-item">
+      <div class="mlabel">Stack</div>
+      <div class="mval">Claude · Notion · Zapier</div>
+    </div>
+    <div class="meta-item">
+      <div class="mlabel">Type</div>
+      <div class="mval">AI Productivity System</div>
+    </div>
+    <div class="meta-item">
+      <div class="mlabel">Built by</div>
+      <div class="mval">Eliana Ochoa</div>
+    </div>
+  </div>
+</div>
+
+<div class="stripe"></div>
+
+<section id="problem">
+  <div class="section-label">// 01 — The Problem</div>
+  <h2>2+ hours a week.<br>Just deciding what to do.</h2>
+  <p class="body-text">
+    Knowledge workers managing multiple projects, clients, and habits lose serious time
+    every week on planning overhead — with no AI to help, no system that connects everything,
+    and no feedback loop to stay motivated.
+  </p>
+  <div class="prob-grid">
+    <div class="prob-card">
+      <div class="prob-icon">🧠</div>
+      <h3>Decision fatigue</h3>
+      <p>Reprioritizing manually every morning. No context. No AI. Just guessing what matters most.</p>
+    </div>
+    <div class="prob-card">
+      <div class="prob-icon">🗂️</div>
+      <h3>Tasks everywhere</h3>
+      <p>Email, notes, Slack — scattered across tools with no single source of truth.</p>
+    </div>
+    <div class="prob-card">
+      <div class="prob-icon">👻</div>
+      <h3>Progress is invisible</h3>
+      <p>No feedback loop. No way to see momentum. Consistency breaks down without a system.</p>
+    </div>
+    <div class="prob-card">
+      <div class="prob-icon">🔁</div>
+      <h3>Manual everything</h3>
+      <p>Weekly reviews, habit logs, status updates — all done by hand, eating time that should go to real work.</p>
+    </div>
+  </div>
+</section>
+
+<div class="stripe"></div>
+
+<section id="system">
+  <div class="section-label">// 02 — The System</div>
+  <h2>Claude runs your day.<br>You just show up.</h2>
+  <p class="body-text">
+    Four automated workflows connect Notion, Zapier, and Claude — handling planning,
+    prioritization, habit check-ins, and weekly reviews without any manual input.
+  </p>
+  <div class="workflow">
+    <div class="wf-step">
+      <div class="wf-num">01</div>
+      <div class="wf-content">
+        <div class="wf-tag">⏰ Every day · 8:00 AM</div>
+        <h3>Morning plan, generated automatically</h3>
+        <p>Zapier reads your task list, top project, and energy level from Notion — sends everything to Claude — writes your focused daily plan back before you open your laptop.</p>
+      </div>
+    </div>
+    <div class="wf-step">
+      <div class="wf-num">02</div>
+      <div class="wf-content">
+        <div class="wf-tag">➕ On new task added</div>
+        <h3>Auto-prioritization — no scoring needed</h3>
+        <p>Every new task triggers Claude to score it by impact, urgency, and energy required. The priority field in Notion updates automatically. You never manually rank a task again.</p>
+      </div>
+    </div>
+    <div class="wf-step">
+      <div class="wf-num">03</div>
+      <div class="wf-content">
+        <div class="wf-tag">🌙 Every day · 9:00 PM</div>
+        <h3>Honest habit check-in</h3>
+        <p>Zapier reads your habit data and current streak — Claude gives a brief, honest check-in with one practical tip — written back to Notion with your streak counter updated.</p>
+      </div>
+    </div>
+    <div class="wf-step">
+      <div class="wf-num">04</div>
+      <div class="wf-content">
+        <div class="wf-tag">📊 Every Sunday · 6:00 PM</div>
+        <h3>Weekly review, ready Monday morning</h3>
+        <p>Claude analyzes your full week — completed tasks, missed items, habits, points — and generates a review with pattern observations and next week's focus recommendation.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="stripe"></div>
+
+<section id="prompts">
+  <div class="section-label">// 03 — AI Prompt System</div>
+  <h2>4 prompts.<br>One for every moment.</h2>
+  <p class="body-text">
+    Each prompt is engineered for a specific point in the productivity cycle —
+    tuned for tone, length, and output format.
+  </p>
+  <div class="prompt-grid">
+    <div class="prompt-card pc-morning">
+      <div class="pc-trigger">⏰ Daily · 8:00 AM</div>
+      <h3>Morning Plan</h3>
+      <p>Top 3 must-do tasks · 90-min deep work block · One sentence of motivational context · Under 150 words · Direct, not generic</p>
+    </div>
+    <div class="prompt-card pc-task">
+      <div class="pc-trigger">➕ On new task</div>
+      <h3>Task Prioritization</h3>
+      <p>Impact score 1–10 · Urgency score · Energy level required · Priority ranking with one-line reasoning per task</p>
+    </div>
+    <div class="prompt-card pc-habit">
+      <div class="pc-trigger">🌙 Daily · 9:00 PM</div>
+      <h3>Habit Check-in</h3>
+      <p>Acknowledge what was done · One practical tip for missed habits · Streak status · Honest, under 50 words</p>
+    </div>
+    <div class="prompt-card pc-weekly">
+      <div class="pc-trigger">📊 Sunday · 6:00 PM</div>
+      <h3>Weekly Review</h3>
+      <p>What went well · Patterns identified · Next week focus · Honest and specific — not just positive · Under 200 words</p>
+    </div>
+  </div>
+</section>
+
+<div class="stripe"></div>
+
+<section id="gamification">
+  <div class="section-label">// 04 — Gamification Engine</div>
+  <h2>Built into Notion.<br>No extra app needed.</h2>
+  <p class="body-text">
+    Points, levels, and streaks run entirely on Notion formulas —
+    calculating automatically when tasks are completed and habits are tracked.
+  </p>
+
+  <table class="pts-table" style="margin-bottom: 48px;">
+    <thead>
+      <tr><th>Action</th><th>Points</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Complete a Low priority task</td><td>+5 pts</td></tr>
+      <tr><td>Complete a Medium priority task</td><td>+10 pts</td></tr>
+      <tr><td>Complete a High priority task</td><td>+20 pts</td></tr>
+      <tr><td>Complete task before deadline</td><td>+5 bonus</td></tr>
+      <tr><td>Complete a daily habit</td><td>+5 pts</td></tr>
+      <tr><td>Perfect habit day (all habits)</td><td>+15 bonus</td></tr>
+      <tr><td>7-day streak</td><td>+50 bonus</td></tr>
+      <tr><td>Complete a full project</td><td>+100 pts</td></tr>
+    </tbody>
+  </table>
+
+  <div class="levels-grid">
+    <div class="level-card"><div class="level-emoji">🌱</div><div class="level-num">LEVEL 01</div><div class="level-name">Starter</div><div class="level-pts">0 pts</div></div>
+    <div class="level-card"><div class="level-emoji">🔨</div><div class="level-num">LEVEL 02</div><div class="level-name">Builder</div><div class="level-pts">100 pts</div></div>
+    <div class="level-card"><div class="level-emoji">🎯</div><div class="level-num">LEVEL 03</div><div class="level-name">Focused</div><div class="level-pts">300 pts</div></div>
+    <div class="level-card"><div class="level-emoji">🚀</div><div class="level-num">LEVEL 04</div><div class="level-name">Momentum</div><div class="level-pts">600 pts</div></div>
+    <div class="level-card"><div class="level-emoji">🌊</div><div class="level-num">LEVEL 05</div><div class="level-name">Flow State</div><div class="level-pts">1,000 pts</div></div>
+    <div class="level-card"><div class="level-emoji">⚙️</div><div class="level-num">LEVEL 06</div><div class="level-name">Optimizer</div><div class="level-pts">2,000 pts</div></div>
+    <div class="level-card"><div class="level-emoji">🏆</div><div class="level-num">LEVEL 07</div><div class="level-name">Master</div><div class="level-pts">5,000 pts</div></div>
+    <div class="level-card" style="background: var(--purple-light); border-color: #A78BFA;"><div class="level-emoji">∞</div><div class="level-num">YOUR GOAL</div><div class="level-name" style="color:#6D28D9;">Keep going</div><div class="level-pts">no limit</div></div>
+  </div>
+</section>
+
+<div class="stripe"></div>
+
+<section id="results">
+  <div class="section-label">// 05 — Results</div>
+  <h2>Less overhead.<br>More output.</h2>
+  <p class="body-text">
+    FocusOS automates the parts of productivity management that drain energy
+    without producing output — freeing real time for actual work.
+  </p>
+  <div class="results-grid">
+    <div class="result-card">
+      <div class="r-before">Planning time · was 2+ hrs/week</div>
+      <div class="r-after">5 min</div>
+      <div class="r-label">Daily planning time</div>
+    </div>
+    <div class="result-card">
+      <div class="r-before">Was done manually</div>
+      <div class="r-after">Auto</div>
+      <div class="r-label">Task prioritization</div>
+    </div>
+    <div class="result-card">
+      <div class="r-before">Was scattered across tools</div>
+      <div class="r-after">1</div>
+      <div class="r-label">Single system for everything</div>
+    </div>
+    <div class="result-card">
+      <div class="r-before">Was invisible</div>
+      <div class="r-after">Live</div>
+      <div class="r-label">Progress & momentum tracking</div>
+    </div>
+  </div>
+
+  <div class="stack-row">
+    <div class="stack-pill">Claude AI</div>
+    <div class="stack-pill">Notion</div>
+    <div class="stack-pill">Zapier</div>
+    <div class="stack-pill">Notion Formulas</div>
+    <div class="stack-pill">GitHub Pages</div>
+  </div>
+</section>
+
+<footer>
+  Built by <span>Eliana Ochoa</span> · Operations & AI Automation Specialist · Porto, Portugal
+</footer>
+
+</body>
+</html>
